@@ -55,7 +55,7 @@ class Post(models.Model):
         return self.article_text[0:124] + '...'
 
     def __str__(self):
-        return self.article_title
+        return f'{self.article_title}: {self.article_text[:20]}...'
 
     class Meta:
         verbose_name = 'Пост'
