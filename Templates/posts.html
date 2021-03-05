@@ -10,10 +10,8 @@
 
 <!-- В контенте на странице мы выводим все товары -->
 {% block content %}
-    <h1>Всего публикаций: {{ posts | length }}</h1>
+    <h1>Публикации</h1>
     <h3>{{ time_now | date:'M d Y'}}</h3>
-    <h3> {{ value1 | default_if_none:"Ничего" }} </h3> <!-- Здесь, если в переменной value1 будет записано None, то выведется текст НИЧЕГО -->
-    <h3> {{ test | default:"A тут пустая строка или список и т.д." }} </h3>
     <hr>
     {% if posts %} <!-- Если есть товары, то выводим таблицу с ними -->
         <table>
@@ -39,4 +37,29 @@
     {% else %}
         <h2>Публикаций нет!</h2>
     {% endif %}
+<!-- Проверяем что поддерживается постраничный вывод -->
+{% if is_paginated %}
+
+    <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+
+{% endif %}
 {% endblock content %}
