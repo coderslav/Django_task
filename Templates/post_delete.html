@@ -1,0 +1,38 @@
+{% extends 'default.html' %}
+
+{% load custom_filters %}
+
+{% block title %} Публикации {% endblock title %}
+
+{% block content %}
+<h2>Вы действительно хотите удалить данную публикацию?</h2>
+<table>
+    <thead>
+        <th>
+            Заголовок
+        </th>
+        <th>
+            Описание
+        </th>
+        <th>
+            Время добавления
+        </th>
+    </thead>
+    <tr>
+        <td>
+            {{ post.article_title | censor }}
+        </td>
+        <td>
+            {{ post.article_text | censor | truncatechars:80 }}
+        </td>
+        <td>
+            {{ post.article_time_in | date:'d-m-y H:i' }}
+        </td>
+    </tr>
+</table>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Подтвердить"></form>
+<a href="{% url 'posts_full' %}"><u> Отмена </u></a>
+{% endblock content %}

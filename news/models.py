@@ -51,11 +51,12 @@ class Post(models.Model):
         self.article_rating = -1
         self.save()
 
-    def preview(self):
-        return self.article_text[0:124] + '...'
-
     def __str__(self):
         return f'{self.article_title}: {self.article_text[:20]}...'
+
+    def get_absolute_url(self):  # добавим абсолютный путь чтобы после создания нас перебрасывало на страницу с товаром
+        return f'/news/{self.id}'
+    #  создаём категорию, к которой будет привязываться товар
 
     class Meta:
         verbose_name = 'Пост'
