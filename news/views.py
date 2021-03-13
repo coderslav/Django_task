@@ -1,12 +1,13 @@
 # from django.shortcuts import render
 
 # Create your views here.
-from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView # импортируем класс, который
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView  # импортируем класс, который
 # говорит нам о том, что в этомпредставлении мы будем выводить список объектов из БД
 from .models import Post
 from datetime import datetime
 from .filters import NewsFilter
 from .forms import NewsForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class NewsList(ListView):
@@ -60,18 +61,18 @@ class NewsDetail(DetailView):
     context_object_name = 'post'
 
 
-class NewsCreate(CreateView):
+class NewsCreate(LoginRequiredMixin, CreateView):
     template_name = 'post_create.html'
     form_class = NewsForm
 
 
-class NewsDelete(DeleteView):
+class NewsDelete(LoginRequiredMixin, DeleteView):
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
     success_url = '/news/full/'
 
 
-class NewsUpdate(UpdateView):
+class NewsUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'post_create.html'
     form_class = NewsForm
 
