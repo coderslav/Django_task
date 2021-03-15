@@ -7,7 +7,7 @@ from .models import Post
 from datetime import datetime
 from .filters import NewsFilter
 from .forms import NewsForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.shortcuts import redirect
@@ -41,12 +41,13 @@ class NewsSearch(ListView):
         return context
 
 
-class FullNews(ListView):
+class FullNews(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Post
     template_name = 'posts_full.html'
     context_object_name = 'posts'
     ordering = ['-article_time_in']
     paginate_by = 1  # поставим постраничный вывод в один элемент
+    permission_required = ('news.view_post',)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -59,26 +60,30 @@ class FullNews(ListView):
         return context
 
 
-class NewsDetail(DetailView):
+class NewsDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
+    permission_required = ('news.view_post',)
 
 
-class NewsCreate(LoginRequiredMixin, CreateView):
+class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = 'post_create.html'
     form_class = NewsForm
+    permission_required = ('news.add_post', 'news.change_post')
 
 
-class NewsDelete(LoginRequiredMixin, DeleteView):
+class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
     success_url = '/news/full/'
+    permission_required = ('news.delete_post',)
 
 
-class NewsUpdate(LoginRequiredMixin, UpdateView):
+class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     template_name = 'post_create.html'
     form_class = NewsForm
+    permission_required = ('news.change_post', 'news.add_post')
 
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
