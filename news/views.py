@@ -8,6 +8,9 @@ from datetime import datetime
 from .filters import NewsFilter
 from .forms import NewsForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
+from django.shortcuts import redirect
 
 
 class NewsList(ListView):
@@ -52,6 +55,7 @@ class FullNews(ListView):
         # фильтра
         context['test'] = ''
         context['filter'] = NewsFilter(self.request.GET, queryset=self.get_queryset())
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
 
@@ -79,3 +83,12 @@ class NewsUpdate(LoginRequiredMixin, UpdateView):
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
         return Post.objects.get(pk=id)
+
+
+@login_required
+def upgrade_me(request):
+    user = request.user
+    premium_group = Group.objects.get(name='authors')
+    if not request.user.groups.filter(name='authors').exists():
+        premium_group.user_set.add(user)
+    return redirect('/news/full/')

@@ -29,5 +29,12 @@
     </tr>
     {% endfor %}
 </table>
-<a href="{% url 'post_create' %}">Добавить новую публикацию</a> <br>
+<button><a href="{% url 'post_create' %}">Добавить новую публикацию</a></button><br>
+{% if is_not_author %}
+<button> <a href="{% url 'upgrade_user' %}"> Стать автором!</a> </button>
+{% endif %}
+
+<td>
+            {{ current_user }}
+</td>
 {% endblock content %}
