@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Sum
 
 
 # Create your models here.
@@ -8,8 +9,18 @@ class Author(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
     author_rating = models.IntegerField(default=0, verbose_name='Рейтинг автора')
 
+    # метод функционирует, но надо разобраться, как работает методы post_set/comment_set и aggregate:
     def update_rating(self):
-        self.author_rating = (Post.article_rating * 3) + Comment.comment_rating
+
+        post_rat = self.post_set.all().aggregate(post_rtg=Sum('article_rating'))
+        p_rat = 0
+        p_rat += post_rat.get('post_rtg')
+
+        comment_rat = self.author.comment_set.all().aggregate(comment_rtg=Sum('comment_rating'))
+        c_rat = 0
+        c_rat += comment_rat.get('comment_rtg')
+
+        self.author_rating = (p_rat * 3) + c_rat
         self.save()
 
     def __str__(self):
@@ -22,6 +33,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=255, unique=True, verbose_name='Наименование категории')
+    category_subscriber = models.ManyToManyField(User, verbose_name="Подписчик категории")
 
     def __str__(self):
         return self.category_name
@@ -44,11 +56,11 @@ class Post(models.Model):
     article_rating = models.IntegerField(default=0, verbose_name='Рейтинг публикации')
 
     def like(self):
-        self.article_rating = +1
+        self.article_rating += 1
         self.save()
 
     def dislike(self):
-        self.article_rating = -1
+        self.article_rating -= 1
         self.save()
 
     def __str__(self):
@@ -63,11 +75,6 @@ class Post(models.Model):
         verbose_name_plural = 'Посты'
 
 
-class PostCategory(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-
-
 class Comment(models.Model):
     comment_post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name='Комментируемый пост')
     comment_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Автор коммента')
@@ -76,11 +83,11 @@ class Comment(models.Model):
     comment_rating = models.IntegerField(default=0, verbose_name='Рейтинг комментария')
 
     def like(self):
-        self.comment_rating = +1
+        self.comment_rating += 1
         self.save()
 
     def dislike(self):
-        self.comment_rating = -1
+        self.comment_rating -= 1
         self.save()
 
     def __str__(self):

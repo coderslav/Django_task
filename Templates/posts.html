@@ -13,23 +13,43 @@
 <h1>Публикации</h1>
 <h3>{{ time_now }}</h3>
 <hr>
-{% if posts %} <!-- Если есть товары, то выводим таблицу с ними -->
+{% if posts %}
 <table>
     <thead>
+        <th>
+            Автор
+        </th>
         <th>
             Заголовок
         </th>
         <th>
             Описание
         </th>
+        <th>
+            Категория
+        </th>
+        <th>
+            Время публикации
+        </th>
     </thead>
-    {% for post in posts %} <!-- Для каждого товара будете генерироваться новая строчка, т.е. новый html код. При этом сам цикл работет точно также, как и в python. product — переменная цикла, т.е. наш товар взятый из общего списка -->
+    {% for post in posts %}
     <tr>
         <td>
-            {{ post.article_title | censor }} <!-- не забываем что переменные в шаблоне ничем не отличаются от переменных в python. Здесь также можно получать доступ к полям класса. Например здесь мы выводим имя, в следующем столбце описание, и т.д.  -->
+            {{ post.article_author }}
+        </td>
+        <td>
+            {{ post.article_title | censor }}
         </td>
         <td>
             {{ post.article_text | censor | truncatechars:50 }}
+        </td>
+        <td>
+            {% for category in post.article_category.all %}{{ category }}<br>
+            <button type="submit" name="subscribe" value="">Подписаться на {{ category }}</button><br>
+            {% endfor %}
+        </td>
+        <td>
+            {{ post.article_time_in | date:"d-m-Y H:i"}}
         </td>
     </tr>
     {% endfor %}
