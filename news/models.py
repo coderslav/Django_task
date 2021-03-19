@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 # Create your models here.
 class Author(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
+    author = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Автор')
     author_rating = models.IntegerField(default=0, verbose_name='Рейтинг автора')
 
     # метод функционирует, но надо разобраться, как работает методы post_set/comment_set и aggregate:
@@ -77,7 +77,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
     comment_post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name='Комментируемый пост')
-    comment_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Автор коммента')
+    comment_user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор коммента')
     comment_text = models.TextField(verbose_name='Текст комментария')
     comment_time_in = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     comment_rating = models.IntegerField(default=0, verbose_name='Рейтинг комментария')
