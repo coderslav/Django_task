@@ -6,17 +6,18 @@ from django.db.models import Sum
 
 # Create your models here.
 class Author(models.Model):
-    author = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Автор')
+    author_user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Автор')
     author_rating = models.IntegerField(default=0, verbose_name='Рейтинг автора')
 
     # метод функционирует, но надо разобраться, как работает методы post_set/comment_set и aggregate:
     def update_rating(self):
 
-        post_rat = self.post_set.all().aggregate(post_rtg=Sum('article_rating'))
+        post_rat = self.posts.all().aggregate(post_rtg=Sum('article_rating'))
+        # Почему posts а не post_set - смотри поле article_author в классе Post
         p_rat = 0
         p_rat += post_rat.get('post_rtg')
 
-        comment_rat = self.author.comment_set.all().aggregate(comment_rtg=Sum('comment_rating'))
+        comment_rat = self.author_user.comment_set.all().aggregate(comment_rtg=Sum('comment_rating'))
         c_rat = 0
         c_rat += comment_rat.get('comment_rtg')
 
@@ -24,7 +25,7 @@ class Author(models.Model):
         self.save()
 
     def __str__(self):
-        return self.author.username
+        return self.author_user.username
 
     class Meta:
         verbose_name = 'Автор'
@@ -33,7 +34,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=255, unique=True, verbose_name='Наименование категории')
-    category_subscriber = models.ManyToManyField(User, verbose_name="Подписчик категории")
+    category_subscriber = models.ManyToManyField(User, blank=True, verbose_name="Подписчик категории")
 
     def __str__(self):
         return self.category_name
@@ -47,7 +48,9 @@ class Post(models.Model):
     ARTICLE_TYPES = (
         ('news', 'Новости'), ('article', 'Статья')
     )
-    article_author = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name='Автор статьи или новости')
+    article_author = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name='Автор статьи или новости',
+                                       related_name='posts')
+    # добавлен related_name, чтобы изменить стандартный post_set
     article_choice = models.CharField(max_length=50, choices=ARTICLE_TYPES)
     article_time_in = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     article_category = models.ManyToManyField(Category, verbose_name='Категория публикации')
@@ -91,7 +94,8 @@ class Comment(models.Model):
         self.save()
 
     def __str__(self):
-        return self.comment_post.article_title
+        return f'"{self.comment_text[0:15]}..." В публикации: "{self.comment_post.article_title}" ' \
+               f'От автора: {self.comment_user.username}'
 
     class Meta:
         verbose_name = 'Комментарий'

@@ -1,16 +1,22 @@
-# from django.shortcuts import render
-
-# Create your views here.
-from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView  # импортируем класс, который
-# говорит нам о том, что в этомпредставлении мы будем выводить список объектов из БД
-from .models import Post
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
+from .models import Post, Category
 from datetime import datetime
 from .filters import NewsFilter
 from .forms import NewsForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
+
+
+@login_required
+def SubscribeView(request):
+    category = get_object_or_404(Category, id=request.POST.get('category_id'))
+    if category.category_subscriber.filter(id=request.user.id).exists():
+        category.category_subscriber.remove(request.user)
+    else:
+        category.category_subscriber.add(request.user)
+    return redirect('index')
 
 
 class NewsList(ListView):
@@ -76,7 +82,7 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
-    success_url = '/news/full/'
+    success_url = 'posts_full'
     permission_required = ('news.delete_post',)
 
 
@@ -96,4 +102,4 @@ def upgrade_me(request):
     premium_group = Group.objects.get(name='authors')
     if not request.user.groups.filter(name='authors').exists():
         premium_group.user_set.add(user)
-    return redirect('/news/full/')
+    return redirect('posts_full')

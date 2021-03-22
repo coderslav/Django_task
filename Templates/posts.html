@@ -45,7 +45,17 @@
         </td>
         <td>
             {% for category in post.article_category.all %}{{ category }}<br>
-            <button type="submit" name="subscribe" value="">Подписаться на {{ category }}</button><br>
+            {% if user in category.category_subscriber.all %}
+                <form action = "{% url 'subscribe' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" name="category_id" value="{{ category.id }}">Отписаться от {{ category }}</button>
+                </form>
+            {% else %}
+                <form action = "{% url 'subscribe' %}"  method="POST">
+                {% csrf_token %}
+                <button type="submit" name="category_id" value="{{ category.id }}">Подписаться на {{ category }}</button>
+                </form>
+            {% endif %}
             {% endfor %}
         </td>
         <td>
