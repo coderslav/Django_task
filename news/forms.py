@@ -1,4 +1,4 @@
-from django.forms import ModelForm, BooleanField
+from django.forms import ModelForm
 from .models import Post
 from django.contrib.auth.models import Group
 from allauth.account.forms import SignupForm

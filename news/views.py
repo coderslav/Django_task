@@ -1,5 +1,5 @@
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
-from .models import Post, Category
+from .models import Post, Category, Author
 from datetime import datetime
 from .filters import NewsFilter
 from .forms import NewsForm
@@ -7,6 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.shortcuts import redirect, get_object_or_404
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 
 @login_required
@@ -14,8 +16,33 @@ def SubscribeView(request):
     category = get_object_or_404(Category, id=request.POST.get('category_id'))
     if category.category_subscriber.filter(id=request.user.id).exists():
         category.category_subscriber.remove(request.user)
+        sub_trigger = False
     else:
         category.category_subscriber.add(request.user)
+        sub_trigger = True
+    html_context_category = {'sub_category_name': category, 'sub_category_user': request.user}
+    if sub_trigger:
+        html_content = render_to_string('mail_notification_subscribe.html', html_context_category)
+        msg = EmailMultiAlternatives(
+            subject=f'Подтверждение подписки на обновления в категории {html_context_category["sub_category_name"]} '
+                    f'(velosiped.test)',
+            # from_email='testun_test@mail.ru', # заменили на дефолтный в настройках
+            to=['testersaitin@yandex.ru'],  # это то же, что и recipients_list
+        )
+        msg.attach_alternative(html_content, "text/html")  # добавляем html
+
+        msg.send()  # отсылаем
+    else:
+        html_content = render_to_string('mail_notification_unsubscribe.html', html_context_category)
+        msg = EmailMultiAlternatives(
+            subject=f'Подтверждение отписки от обновлений в категории {html_context_category["sub_category_name"]} '
+                    f'(velosiped.test)',
+            from_email='testun_test@mail.ru',
+            to=['testersaitin@yandex.ru'],  # это то же, что и recipients_list
+        )
+        msg.attach_alternative(html_content, "text/html")  # добавляем html
+
+        msg.send()  # отсылаем
     return redirect('index')
 
 
@@ -78,11 +105,34 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = NewsForm
     permission_required = ('news.add_post', 'news.change_post')
 
+    def post(self, request, *args, **kwargs):
+        f = NewsForm(request.POST)
+        post = f.save()
+        new_post_categories = post.article_category.all()
+
+        list_of_users = []
+        html_context = {'new_post': post, }
+        for cat in new_post_categories:
+            html_context['new_post_category'] = cat
+            subs = Category.objects.get(category_name=cat).category_subscriber.all()
+            for sub in subs:
+                list_of_users.append(sub.email)
+
+        html_content = render_to_string('mail_subscription_update.html', html_context)
+        msg = EmailMultiAlternatives(
+            subject='Новая публикация на velosiped.test',
+            from_email='testun_test@mail.ru',
+            to=list_of_users
+        )
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+        return redirect('posts_full')
+
 
 class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
-    success_url = 'posts_full'
+    success_url = '/news/full/'
     permission_required = ('news.delete_post',)
 
 

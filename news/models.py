@@ -67,7 +67,7 @@ class Post(models.Model):
         self.save()
 
     def __str__(self):
-        return f'{self.article_title}: {self.article_text[:20]}...'
+        return f'{self.article_title}: {self.article_text[:50]}...'
 
     def get_absolute_url(self):  # добавим абсолютный путь чтобы после создания нас перебрасывало на страницу с товаром
         return f'/news/{self.id}'
