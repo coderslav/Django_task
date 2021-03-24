@@ -111,7 +111,7 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         new_post_categories = post.article_category.all()
 
         list_of_users = []
-        html_context = {'new_post': post, }
+        html_context = {'new_post': post, 'new_post_id': post.id, }
         for cat in new_post_categories:
             html_context['new_post_category'] = cat
             subs = Category.objects.get(category_name=cat).category_subscriber.all()
@@ -126,7 +126,7 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         )
         msg.attach_alternative(html_content, "text/html")
         msg.send()
-        return redirect('posts_full')
+        return redirect('post_detail', post.id)
 
 
 class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):

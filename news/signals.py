@@ -12,7 +12,7 @@ def notify_subscribers(sender, action, instance, **kwargs):
     if action == 'post_add':
         new_post_categories = instance.article_category.all()
         list_of_users = []
-        html_context = {'new_post': instance, }
+        html_context = {'new_post': instance, 'new_post_id': instance.id, }
         for cat in new_post_categories:
             html_context['new_post_category'] = cat
             subs = cat.category_subscriber.all()
