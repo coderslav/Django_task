@@ -2,7 +2,7 @@ from django.template.loader import render_to_string
 from .models import Post
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver  # импортируем нужный декоратор
-from django.core.mail import EmailMultiAlternatives
+from .tasks import cat_update_notifier
 
 
 # в декоратор передаётся первым аргументом сигнал, на который будет реагировать эта функция, и в отправители надо
@@ -19,10 +19,12 @@ def notify_subscribers(sender, action, instance, **kwargs):
             for sub in subs:
                 list_of_users.append(sub.email)
         html_content = render_to_string('mail_subscription_update.html', html_context)
-        msg = EmailMultiAlternatives(
-           subject='Новая публикация на velosiped.test',
-           from_email='testun_test@mail.ru',
-           to=list_of_users
-        )
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        cat_update_notifier.delay(list_of_users, html_content)
+
+        # msg = EmailMultiAlternatives(
+        #    subject='Новая публикация на velosiped.test',
+        #    from_email='testun_test@mail.ru',
+        #    to=list_of_users
+        # )
+        # msg.attach_alternative(html_content, "text/html")
+        # msg.send()

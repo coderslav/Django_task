@@ -1,5 +1,5 @@
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
-from .models import Post, Category, Author
+from .models import Post, Category
 from datetime import datetime
 from .filters import NewsFilter
 from .forms import NewsForm
@@ -105,28 +105,28 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = NewsForm
     permission_required = ('news.add_post', 'news.change_post')
 
-    def post(self, request, *args, **kwargs):
-        f = NewsForm(request.POST)
-        post = f.save()
-        new_post_categories = post.article_category.all()
-
-        list_of_users = []
-        html_context = {'new_post': post, 'new_post_id': post.id, }
-        for cat in new_post_categories:
-            html_context['new_post_category'] = cat
-            subs = Category.objects.get(category_name=cat).category_subscriber.all()
-            for sub in subs:
-                list_of_users.append(sub.email)
-
-        html_content = render_to_string('mail_subscription_update.html', html_context)
-        msg = EmailMultiAlternatives(
-            subject='Новая публикация на velosiped.test',
-            from_email='testun_test@mail.ru',
-            to=list_of_users
-        )
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-        return redirect('post_detail', post.id)
+    # def post(self, request, *args, **kwargs):
+    #     f = NewsForm(request.POST)
+    #     post = f.save()
+    #     new_post_categories = post.article_category.all()
+    #
+    #     list_of_users = []
+    #     html_context = {'new_post': post, 'new_post_id': post.id, }
+    #     for cat in new_post_categories:
+    #         html_context['new_post_category'] = cat
+    #         subs = Category.objects.get(category_name=cat).category_subscriber.all()
+    #         for sub in subs:
+    #             list_of_users.append(sub.email)
+    #
+    #     html_content = render_to_string('mail_subscription_update.html', html_context)
+    #     msg = EmailMultiAlternatives(
+    #         subject='Новая публикация на velosiped.test',
+    #         from_email='testun_test@mail.ru',
+    #         to=list_of_users
+    #     )
+    #     msg.attach_alternative(html_content, "text/html")
+    #     msg.send()
+    #     return redirect('post_detail', post.id)
 
 
 class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
