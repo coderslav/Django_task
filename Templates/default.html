@@ -1,5 +1,7 @@
 {% load static %}
+{% load cache %}
 
+{% cache 60 static_1%}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
-
+{% endcache %}
   <title>Velosiped: {% block title %} {% endblock title %}</title>
 
   <!-- Bootstrap core CSS -->
@@ -18,6 +20,7 @@
 </head>
 
 <body>
+{% cache 60 static_2 %}
 
   <!-- Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
@@ -37,7 +40,7 @@
       </div>
     </div>
   </nav>
-
+{% endcache %}
   <!-- Page Content -->
   <div class="container">
     <div class="row">
@@ -47,11 +50,11 @@
       </div>
     </div>
   </div>
-
+{% cache 60 static_3 %}
   <!-- Bootstrap core JavaScript -->
   <script src="{% static 'vendor/jquery/jquery.slim.min.js' %}"></script>
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
+{% endcache %}
 </body>
 
 </html>

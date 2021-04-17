@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.core.cache import cache
 
 
 # Create your models here.
@@ -71,11 +72,15 @@ class Post(models.Model):
 
     def get_absolute_url(self):  # добавим абсолютный путь чтобы после создания нас перебрасывало на страницу с товаром
         return f'/news/{self.id}'
-    #  создаём категорию, к которой будет привязываться товар
 
     class Meta:
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
+
+    # метод для кеширования до изменения объекта:
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
 
 class Comment(models.Model):

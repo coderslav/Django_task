@@ -51,8 +51,4 @@
 {% if is_not_author %}
 <button> <a href="{% url 'upgrade_user' %}"> Стать автором!</a> </button>
 {% endif %}
-
-<td>
-            {{ current_user }}
-</td>
 {% endblock content %}
