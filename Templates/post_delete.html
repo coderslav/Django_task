@@ -8,31 +8,23 @@
 <h2>Вы действительно хотите удалить данную публикацию?</h2>
 <table>
     <thead>
-        <th>
-            Заголовок
-        </th>
-        <th>
-            Описание
-        </th>
-        <th>
-            Время добавления
-        </th>
+        <tr>
+            <th>Заголовок</th>
+            <th>Описание</th>
+            <th>Время добавления</th>
+        </tr>
     </thead>
-    <tr>
-        <td>
-            {{ post.article_title | censor }}
-        </td>
-        <td>
-            {{ post.article_text | censor | truncatechars:80 }}
-        </td>
-        <td>
-            {{ post.article_time_in | date:'d-m-y H:i' }}
-        </td>
-    </tr>
+    <tbody>
+        <tr>
+            <td>{{ post.article_title | censor }}</td>
+            <td>{{ post.article_text | censor | truncatechars:80 }}</td>
+            <td>{{ post.article_time_in | date:'d-m-y H:i' }}</td>
+        </tr>
+    </tbody>
 </table>
 
 <form method="POST">
     {% csrf_token %}
     <input type="submit" value="Подтвердить"></form>
-<a href="{% url 'posts_full' %}"><u> Отмена </u></a>
+<a href={% url 'posts_full' %}><u> Отмена </u></a>
 {% endblock content %}

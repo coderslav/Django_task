@@ -1,38 +1,26 @@
-<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
 {% extends 'default.html' %}
-
 {% load custom_filters %}
 
-<!-- Название у нас будет proudcts -->
 {% block title %}
 Детали статьи
 {% endblock title %}
 
-<!-- В контенте на странице мы выводим все товары -->
 {% block content %}
 <table>
-            <thead>
-                <th>
-                    Заголовок
-                </th>
-                <th>
-                    Содержание
-                </th>
-                <th>
-                    Время добавления
-                </th>
-            </thead>
-            <tr>
-                <td>
-                    {{ post.article_title | censor }} <!-- не забываем что переменные в шаблоне ничем не отличаются от переменных в python. Здесь также можно получать доступ к полям класса. Например здесь мы выводим имя, в следующем столбце описание, и т.д.  -->
-                </td>
-                <td>
-                    {{ post.article_text | censor }}
-                </td>
-                <td>
-                    {{ post.article_time_in | date:'d-m-y H:i'}}
-                </td>
-            </tr>
+    <thead>
+        <tr>
+            <th>Заголовок</th>
+            <th>Содержание</th>
+            <th>Время добавления</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ post.article_title | censor }}</td>
+            <td>{{ post.article_text | censor }}</td>
+            <td>{{ post.article_time_in | date:'d-m-y H:i'}}</td>
+        </tr>
+    </tbody>
         </table>
-<a href="{% url 'posts_full' %}"><u>Назад</u></a>
+<a href={% url 'posts_full' %}><u>Назад</u></a>
 {% endblock content %}

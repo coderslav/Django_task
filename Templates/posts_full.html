@@ -9,46 +9,32 @@
 
 <table>
     <thead>
-        <th>
-            Автор
-        </th>
-        <th>
-            Заголовок
-        </th>
-        <th>
-            Описание
-        </th>
-        <th>
-            Категория
-        </th>
-        <th>
-            Время публикации
-        </th>
+        <tr>
+            <th>Автор</th>
+            <th>Заголовок</th>
+            <th>Описание</th>
+            <th>Категория</th>
+            <th>Время публикации</th>
+        </tr>
     </thead>
+    <tbody>
     {% for post in filter.qs %} <!-- поменяем products на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
-    <tr>
-        <td>
-            {{ post.article_author }}
-        </td>
-        <td>
-            <a href="{% url 'post_detail' post.id %}">{{ post.article_title | title | censor }}</a>
-            <a href="{% url 'post_update' post.id %}"><u>Редактировать</u></a>
-            <a href="{% url 'post_delete' post.id %}"><u> Удалить </u></a>
-        </td>
-        <td>
-            {{ post.article_text | censor | truncatechars:50}}
-        </td>
-        <td>
-            {{ post.article_category.all | join:", " }}
-        </td>
-        <td>
-            {{ post.article_time_in | date:"d-m-Y H:i" }}
-        </td>
-    </tr>
+        <tr>
+            <td>{{ post.article_author }}</td>
+            <td>
+                <a href={% url 'post_detail' post.id %}>{{ post.article_title | title | censor }}</a>
+                <a href={% url 'post_update' post.id %}><u>Редактировать</u></a>
+                <a href={% url 'post_delete' post.id %}><u> Удалить </u></a>
+            </td>
+            <td>{{ post.article_text | censor | truncatechars:50}}</td>
+            <td>{{ post.article_category.all | join:", " }}</td>
+            <td>{{ post.article_time_in | date:"d-m-Y H:i" }}</td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
-<button><a href="{% url 'post_create' %}">Добавить новую публикацию</a></button><br>
+<button><a href={% url 'post_create' %}>Добавить новую публикацию</a></button><br>
 {% if is_not_author %}
-<button> <a href="{% url 'upgrade_user' %}"> Стать автором!</a> </button>
+<button> <a href={% url 'upgrade_user' %}> Стать автором!</a> </button>
 {% endif %}
 {% endblock content %}

@@ -12,59 +12,45 @@
 {% if posts %}
 <table>
     <thead>
-        <th>
-            Автор
-        </th>
-        <th>
-            Заголовок
-        </th>
-        <th>
-            Описание
-        </th>
-        <th>
-            Категория
-        </th>
-        <th>
-            Время публикации
-        </th>
+        <tr>
+            <th>Автор</th>
+            <th>Заголовок</th>
+            <th>Описание</th>
+            <th>Категория</th>
+            <th>Время публикации</th>
+        </tr>
     </thead>
+    <tbody>
     {% for post in posts %}
-    <tr>
-        <td>
-            {{ post.article_author }}
-        </td>
-        <td>
-            {{ post.article_title | censor }}
-        </td>
-        <td>
-            {{ post.article_text | censor | truncatechars:50 }}
-        </td>
-        <td>
-            {% for category in post.article_category.all %}{{ category }}<br>
-            {% if user in category.category_subscriber.all %}
-                <form action = "{% url 'subscribe' %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" name="category_id" value="{{ category.id }}">Отписаться от {{ category }}</button>
-                </form>
-            {% else %}
-                <form action = "{% url 'subscribe' %}"  method="POST">
-                {% csrf_token %}
-                <button type="submit" name="category_id" value="{{ category.id }}">Подписаться на {{ category }}</button>
-                </form>
-            {% endif %}
-            {% endfor %}
-        </td>
-        <td>
-            {{ post.article_time_in | date:"d-m-Y H:i"}}
-        </td>
-    </tr>
+        <tr>
+            <td>{{ post.article_author }}</td>
+            <td>{{ post.article_title | censor }}</td>
+            <td>{{ post.article_text | censor | truncatechars:50 }}</td>
+            <td>
+                {% for category in post.article_category.all %}{{ category }}<br>
+                {% if user in category.category_subscriber.all %}
+                    <form action = "{% url 'subscribe' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="category_id" value="{{ category.id }}">Отписаться от {{ category }}</button>
+                    </form>
+                {% else %}
+                    <form action = "{% url 'subscribe' %}"  method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="category_id" value="{{ category.id }}">Подписаться на {{ category }}</button>
+                    </form>
+                {% endif %}
+                {% endfor %}
+            </td>
+            <td>{{ post.article_time_in | date:"d-m-Y H:i"}}</td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
 {% else %}
     <h2>Публикаций нет!</h2>
 {% endif %}
 
-<a href="{% url 'posts_full' %}">Редактирование\Полный список публикаций</a> <br>
+<a href={% url 'posts_full' %}>Редактирование\Полный список публикаций</a> <br>
 
 <!-- Проверяем что поддерживается постраничный вывод -->
 {% if is_paginated %}

@@ -148,8 +148,8 @@ class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = ('news.change_post', 'news.add_post')
 
     def get_object(self, **kwargs):
-        id = self.kwargs.get('pk')
-        return Post.objects.get(pk=id)
+        post_id = self.kwargs.get('pk')
+        return Post.objects.get(pk=post_id)
 
 
 @login_required
