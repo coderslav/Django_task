@@ -8,7 +8,9 @@ urlpatterns = [
     path('<int:pk>', NewsDetail.as_view(), name='post_detail'),
     path('search/', NewsSearch.as_view()),
     path('add/', NewsCreate.as_view(), name='post_create'),
-    path('full/', cache_page(60)(FullNews.as_view()), name='posts_full'),
+    # Page with cache:
+    # path('full/', cache_page(60)(FullNews.as_view()), name='posts_full'),
+    path('full/', FullNews.as_view(), name='posts_full'),
     path('delete/<int:pk>/', NewsDelete.as_view(), name='post_delete'),
     path('<int:pk>/edit/', NewsUpdate.as_view(), name='post_update'),
     path('upgrade/', upgrade_me, name='upgrade_user'),

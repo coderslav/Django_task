@@ -12,14 +12,14 @@ def hello():
 
 
 @shared_task
-def printer(n):
+def printer(n: int):
     for i in range(n):
         time.sleep(1)
         print(i+1)
 
 
 @shared_task
-def cat_update_notifier(list_of_users, html_content):
+def cat_update_notifier(list_of_users: list, html_content):
     msg = EmailMultiAlternatives(
         subject='Новая публикация на velosiped.test',
         from_email='testun_test@mail.ru',

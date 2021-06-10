@@ -1,55 +1,59 @@
-<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
 {% extends 'default.html' %}
+{% comment About %}
+All articles page
+{% endcomment %}
+{% load custom_filters_and_tags %}
 
-{% load custom_filters %}
 
 
-<!-- В контенте на странице мы выводим все товары -->
 {% block content %}
 <h1>Публикации</h1>
-<h3>{{ time_now }}</h3>
+    <h3>{{ time_now | date:"d E Y года" }}<br>{% time "%H:%M" %}</h3> <!-- Added custom tag "time" -->
 <hr>
-{% if posts %}
 <table>
     <thead>
         <tr>
-            <th>Автор</th>
-            <th>Заголовок</th>
-            <th>Описание</th>
-            <th>Категория</th>
-            <th>Время публикации</th>
+            <th>{{ 'автор' | capfirst }}</th> <!-- Test "First capital letter - filter"   -->
+            <th>{{ 'Заголовок' }}</th>
+            <th>{{ 'Описание' }}</th>
+            <th>{{ 'Категория' }}</th>
+            <th>{{ 'Время$$$ публикации' | cut:'$' }}</th><!-- Test "Cut- filter" -->
         </tr>
     </thead>
     <tbody>
+
     {% for post in posts %}
+        {% with post.article_category.all as all_art_cat %} <!-- Test with-tag with "as" assignment-->
         <tr>
             <td>{{ post.article_author }}</td>
             <td>{{ post.article_title | censor }}</td>
             <td>{{ post.article_text | censor | truncatechars:50 }}</td>
             <td>
-                {% for category in post.article_category.all %}{{ category }}<br>
-                {% if user in category.category_subscriber.all %}
-                    <form action = "{% url 'subscribe' %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit" name="category_id" value="{{ category.id }}">Отписаться от {{ category }}</button>
-                    </form>
-                {% else %}
-                    <form action = "{% url 'subscribe' %}"  method="POST">
-                    {% csrf_token %}
-                    <button type="submit" name="category_id" value="{{ category.id }}">Подписаться на {{ category }}</button>
-                    </form>
-                {% endif %}
+                {% for category in all_art_cat %}
+                    {% with all_cat_sub=category.category_subscriber.all %} <!-- Test with-tag with "=" assignment-->
+                    {{ category }}<br>
+                    {% if user in all_cat_sub %}
+                        <form action = "{% url 'subscribe' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="category_id" value="{{ category.id }}">Отписаться от {{ category }}</button>
+                        </form>
+                    {% else %}
+                        <form action = "{% url 'subscribe' %}"  method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="category_id" value="{{ category.id }}">Подписаться на {{ category }}</button>
+                        </form>
+                    {% endif %}
+                    {% endwith %}
                 {% endfor %}
             </td>
             <td>{{ post.article_time_in | date:"d-m-Y H:i"}}</td>
         </tr>
+        {% endwith %}
+    {% empty %} <!-- Part of cycle for (built-in Django tags). If list posts is empty, then: -->
+        <h2>Публикаций нет!</h2>
     {% endfor %}
     </tbody>
 </table>
-{% else %}
-    <h2>Публикаций нет!</h2>
-{% endif %}
-
 <a href={% url 'posts_full' %}>Редактирование\Полный список публикаций</a> <br>
 
 <!-- Проверяем что поддерживается постраничный вывод -->

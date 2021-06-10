@@ -1,7 +1,9 @@
-<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
 {% extends 'default.html' %}
-
-{% load custom_filters %}
+{% comment About %}
+All articles page for authenticated users
+{% endcomment %}
+{% load static %}
+{% load custom_filters_and_tags %}
 
 {% block title %} Редактирование публикаций {% endblock title %}
 
@@ -18,8 +20,8 @@
         </tr>
     </thead>
     <tbody>
-    {% for post in filter.qs %} <!-- поменяем products на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
-        <tr>
+    {% for post in filter.qs %} <!-- Поменяем products на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
+        <tr class="{% cycle 'blue' 'white' %}"> <!-- Нужно, чтобы работало! А пока не работает. Возможно, после подключения классов стиля заработает-->
             <td>{{ post.article_author }}</td>
             <td>
                 <a href={% url 'post_detail' post.id %}>{{ post.article_title | title | censor }}</a>
@@ -27,7 +29,7 @@
                 <a href={% url 'post_delete' post.id %}><u> Удалить </u></a>
             </td>
             <td>{{ post.article_text | censor | truncatechars:50}}</td>
-            <td>{{ post.article_category.all | join:", " }}</td>
+            <td>{{ post.article_category.all | join:", " }}</td> <!-- Concatenate categories with ", " - separator-->
             <td>{{ post.article_time_in | date:"d-m-Y H:i" }}</td>
         </tr>
     {% endfor %}

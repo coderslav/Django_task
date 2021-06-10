@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'h30$ghfd9@^*858-crrx@2g69^+495hzfu%2--t881il*il4j&'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -78,7 +76,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'News_Paper.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -88,7 +85,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -108,7 +104,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -121,7 +116,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -163,5 +157,124 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': BASE_DIR / 'cache_files',  # Указываем, куда будем сохранять кэшируемые файлы! Не
         # забываем создать папку cache_files внутри папки с manage.py!
+    }
+}
+
+ABSOLUTE_URL_OVERRIDES = {
+    'news.post': lambda o: f'/news/{o.id}'
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'style': '{',
+            'format': '{asctime} {levelname} {message}',
+        },
+        'advanced': {
+            'style': '{',
+            'format': '{asctime} {levelname} {message} {pathname}'
+        },
+        'super_advanced': {
+            'style': '{',
+            'format': '{asctime} {levelname} {message} {pathname} {exc_info}'
+        },
+        'info_for_file': {
+            'style': '{',
+            'format': '{asctime} {levelname} {module} {message}'
+        },
+        'info_for_file_advanced': {
+            'style': '{',
+            'format': '{asctime} {levelname} {message} {pathname} {exc_info}'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'console_advanced': {
+            'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'advanced'
+        },
+        'console_super_advanced': {
+            'level': 'ERROR',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'super_advanced'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'info_for_file',
+            'filename': 'general.log',
+        },
+        'file_advanced': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'formatter': 'info_for_file_advanced',
+            'filename': 'errors.log',
+        },
+        'security_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'info_for_file',
+            'filename': 'security.log',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'advanced',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'console_advanced', 'console_super_advanced', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file_advanced', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['file_advanced', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['file_advanced'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.db_backends': {
+            'handlers': ['file_advanced'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['security_file'],
+            'propagate': False,
+        },
+        'news.templatetags.custom_filters_and_tags': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     }
 }

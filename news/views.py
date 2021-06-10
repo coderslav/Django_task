@@ -14,6 +14,7 @@ from django.core.cache import cache
 
 @login_required
 def subscribe_view(request):
+    """Вьюшка для функционала кнопок Подписаться/Отписаться + Отправка подтверждения Отписки/Подписки юзеру"""
     category = get_object_or_404(Category, id=request.POST.get('category_id'))
     if category.category_subscriber.filter(id=request.user.id).exists():
         category.category_subscriber.remove(request.user)
@@ -48,13 +49,14 @@ def subscribe_view(request):
 
 
 class NewsList(ListView):
+    """Главная страница (index)"""
     model = Post
     template_name = 'posts.html'
     context_object_name = 'posts'
     ordering = ['-article_time_in']
     paginate_by = 3  # поставим постраничный вывод в один элемент
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self: "NewsList", **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context['time_now'] = datetime.utcnow()
         context['value1'] = None  # добавим ещё одну пустую переменную, чтобы на её примере посмотреть работу другого
@@ -64,25 +66,27 @@ class NewsList(ListView):
         return context
 
 
-class NewsSearch(ListView):
+class NewsSearch(ListView):  # TODO реализовать шаблон и страничку для данной вьюшки
+    """Страница поиска по публикациям"""
     model = Post
     template_name = 'search.html'
     context_object_name = 'posts'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self: "NewsSearch", **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context['filter'] = NewsFilter(self.request.GET, queryset=self.get_queryset())
         return context
 
 
 class FullNews(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """Страница со списком всех публикаций на сайте с возможностью редактирования. Только для авторизированных юзеров"""
     model = Post
     template_name = 'posts_full.html'
     context_object_name = 'posts'
     ordering = ['-article_time_in']
     permission_required = ('news.view_post',)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self: "FullNews", **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context['filter'] = NewsFilter(self.request.GET, queryset=self.get_queryset())
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
@@ -90,13 +94,14 @@ class FullNews(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 
 class NewsDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    """Страница публикации"""
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
     permission_required = ('news.view_post',)
 
-    # кеширование до изменения объекта (метод get_object включительно):
-    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+    def get_object(self: "NewsDetail", *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+        """Кеширование публикации в связке с БД (метод Post.save() в models.py)"""
         obj = cache.get(f'post-{self.kwargs["pk"]}', None)  # кэш очень похож на словарь, и метод get действует
         # # также. Он забирает значение по ключу, если его нет, то забирает None.
         # # если объекта нет в кэше, то получаем его и записываем в кэш
@@ -107,6 +112,7 @@ class NewsDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 
 
 class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    """Страница создания публикации"""
     template_name = 'post_create.html'
     form_class = NewsForm
     permission_required = ('news.add_post', 'news.change_post')
@@ -136,6 +142,7 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
 
 class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """Страница удаления публикации"""
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
     success_url = '/news/full/'
@@ -143,17 +150,19 @@ class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 
 class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """Вью обновления публикации. Страница та же, что и при создании публикации"""
     template_name = 'post_create.html'
     form_class = NewsForm
     permission_required = ('news.change_post', 'news.add_post')
 
-    def get_object(self, **kwargs):
+    def get_object(self: "NewsUpdate", **kwargs):
         post_id = self.kwargs.get('pk')
         return Post.objects.get(pk=post_id)
 
 
 @login_required
 def upgrade_me(request):
+    """Вьюшка добавления в группу авторов"""
     user = request.user
     premium_group = Group.objects.get(name='authors')
     if not request.user.groups.filter(name='authors').exists():

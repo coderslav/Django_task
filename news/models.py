@@ -69,8 +69,9 @@ class Post(models.Model):
     def __str__(self):
         return f'{self.article_title}: {self.article_text[:50]}...'
 
-    def get_absolute_url(self):  # добавим абсолютный путь чтобы после создания нас перебрасывало на страницу с товаром
-        return f'/news/{self.id}'
+    # def get_absolute_url(self):  # добавим абсолютный путь чтобы после создания нас перебрасывало на страницу с
+    # публикацией (настройка мигрировала в settings.ABSOLUTE_URL_OVERRIDES)
+    #     return f'/news/{self.id}'
 
     class Meta:
         verbose_name = 'Пост'
@@ -78,6 +79,7 @@ class Post(models.Model):
 
     # метод для кеширования до изменения объекта:
     def save(self, *args, **kwargs):
+        """Переопределяем метод сохранения с очисткой кеша"""
         super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
         cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
