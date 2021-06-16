@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('news/', include('news.urls')),
     path('accounts/', include('allauth.urls')),
-    path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url("favicon.ico")))
+    path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url("favicon.ico"))),
+    path('i18n/', include('django.conf.urls.i18n')),
 ]

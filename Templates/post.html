@@ -3,18 +3,20 @@
 Article details page
 {% endcomment %}
 {% load custom_filters_and_tags %}
+{% load i18n %}
 
 {% block title %}
 Детали статьи
 {% endblock title %}
 
 {% block content %}
+{% include 'language_switch_form.html' %}
 <table>
     <thead>
         <tr>
-            <th>Заголовок</th>
-            <th>Содержание</th>
-            <th>Время добавления</th>
+            <th>{% translate 'Заголовок' %}</th>
+            <th>{% translate 'Содержание' %}</th>
+            <th>{% translate 'Время добавления' %}</th>
         </tr>
     </thead>
     <tbody>
@@ -24,6 +26,6 @@ Article details page
             <td>{{ post.article_time_in | date:'d-m-y H:i'}}</td>
         </tr>
     </tbody>
-        </table>
-<a href={% url 'posts_full' %}><u>Назад</u></a>
+</table>
+<a href={% url 'posts_full' %}><u>{% translate 'Назад' %}</u></a>
 {% endblock content %}

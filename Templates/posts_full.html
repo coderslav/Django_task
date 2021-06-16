@@ -4,29 +4,30 @@ All articles page for authenticated users
 {% endcomment %}
 {% load static %}
 {% load custom_filters_and_tags %}
+{% load i18n %}
 
 {% block title %} Редактирование публикаций {% endblock title %}
 
 {% block content %}
-
+{% include 'language_switch_form.html' %}
 <table>
     <thead>
         <tr>
-            <th>Автор</th>
-            <th>Заголовок</th>
-            <th>Описание</th>
-            <th>Категория</th>
-            <th>Время публикации</th>
+            <th>{% translate 'Автор'%}</th>
+            <th>{% translate 'Заголовок'%}</th>
+            <th>{% translate 'Описание'%}</th>
+            <th>{% translate 'Категория'%}</th>
+            <th>{% translate 'Время публикации'%}</th>
         </tr>
     </thead>
     <tbody>
     {% for post in filter.qs %} <!-- Поменяем products на filter.qs, т.к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
-        <tr class="{% cycle 'blue' 'white' %}"> <!-- Нужно, чтобы работало! А пока не работает. Возможно, после подключения классов стиля заработает-->
+        <tr class="{% cycle 'blue' 'white' %}"> <!-- TODO Нужно, чтобы работало! А пока не работает. Возможно, после подключения классов стиля заработает-->
             <td>{{ post.article_author }}</td>
             <td>
                 <a href={% url 'post_detail' post.id %}>{{ post.article_title | title | censor }}</a>
-                <a href={% url 'post_update' post.id %}><u>Редактировать</u></a>
-                <a href={% url 'post_delete' post.id %}><u> Удалить </u></a>
+                <a href={% url 'post_update' post.id %}><u>{% translate 'Редактировать'%}</u></a>
+                <a href={% url 'post_delete' post.id %}><u>{% translate 'Удалить'%} </u></a>
             </td>
             <td>{{ post.article_text | censor | truncatechars:50}}</td>
             <td>{{ post.article_category.all | join:", " }}</td> <!-- Concatenate categories with ", " - separator-->
@@ -35,8 +36,8 @@ All articles page for authenticated users
     {% endfor %}
     </tbody>
 </table>
-<button><a href={% url 'post_create' %}>Добавить новую публикацию</a></button><br>
+<button><a href={% url 'post_create' %}>{% translate 'Добавить новую публикацию'%}</a></button><br>
 {% if is_not_author %}
-<button> <a href={% url 'upgrade_user' %}> Стать автором!</a> </button>
+<button> <a href={% url 'upgrade_user' %}>{% translate 'Стать автором!'%}</a> </button>
 {% endif %}
 {% endblock content %}

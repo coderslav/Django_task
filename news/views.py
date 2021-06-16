@@ -72,7 +72,7 @@ class NewsSearch(ListView):  # TODO реализовать шаблон и ст�
     template_name = 'search.html'
     context_object_name = 'posts'
 
-    def get_context_data(self: "NewsSearch", **kwargs) -> dict:
+    def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context['filter'] = NewsFilter(self.request.GET, queryset=self.get_queryset())
         return context
@@ -86,7 +86,7 @@ class FullNews(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     ordering = ['-article_time_in']
     permission_required = ('news.view_post',)
 
-    def get_context_data(self: "FullNews", **kwargs) -> dict:
+    def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context['filter'] = NewsFilter(self.request.GET, queryset=self.get_queryset())
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
@@ -100,7 +100,7 @@ class NewsDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     context_object_name = 'post'
     permission_required = ('news.view_post',)
 
-    def get_object(self: "NewsDetail", *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
         """Кеширование публикации в связке с БД (метод Post.save() в models.py)"""
         obj = cache.get(f'post-{self.kwargs["pk"]}', None)  # кэш очень похож на словарь, и метод get действует
         # # также. Он забирает значение по ключу, если его нет, то забирает None.
@@ -145,7 +145,7 @@ class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Страница удаления публикации"""
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
-    success_url = '/news/full/'
+    success_url = 'posts_full'
     permission_required = ('news.delete_post',)
 
 
@@ -155,7 +155,7 @@ class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = NewsForm
     permission_required = ('news.change_post', 'news.add_post')
 
-    def get_object(self: "NewsUpdate", **kwargs):
+    def get_object(self, **kwargs):
         post_id = self.kwargs.get('pk')
         return Post.objects.get(pk=post_id)
 

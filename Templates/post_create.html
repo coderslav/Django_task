@@ -2,15 +2,17 @@
 {% comment About %}
 Article create/update page
 {% endcomment %}
+{% load i18n %}
 
-{% block title %} Список публикаций {% endblock title %}
+{% block title %} {% translate 'Список публикаций' %} {% endblock title %}
 
 {% block content %}
-<h3>Детали публикации</h3>
+{% include 'language_switch_form.html' %}
+<h3>{% translate 'Детали публикации' %}</h3>
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }} <!-- Теперь нам нужна только готовая форма и кнопка -->
-    <input type="submit" value="Добавить публикацию">
+    <input type="submit" value={% translate 'Добавить публикацию' %}>
 </form>
-<a href={% url 'posts_full' %}><u> Отмена </u></a>
+<a href={% url 'posts_full' %}><u>{% translate 'Отмена' %}</u></a>
 {% endblock content %}

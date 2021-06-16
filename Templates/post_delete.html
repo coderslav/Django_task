@@ -2,19 +2,20 @@
 {% comment About %}
 Article delete page
 {% endcomment %}
-
 {% load custom_filters_and_tags %}
+{% load i18n %}
 
-{% block title %} Публикации {% endblock title %}
+{% block title %} {% translate 'Публикации' %} {% endblock title %}
 
 {% block content %}
-<h2>Вы действительно хотите удалить данную публикацию?</h2>
+{% include 'language_switch_form.html' %}
+<h2>{% translate 'Вы действительно хотите удалить данную публикацию?' %}</h2>
 <table>
     <thead>
         <tr>
-            <th>Заголовок</th>
-            <th>Описание</th>
-            <th>Время добавления</th>
+            <th>{% translate 'Заголовок'%}</th>
+            <th>{% translate 'Описание'%}</th>
+            <th>{% translate 'Время добавления'%}</th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,6 @@ Article delete page
 
 <form method="POST">
     {% csrf_token %}
-    <input type="submit" value="Подтвердить"></form>
-<a href={% url 'posts_full' %}><u> Отмена </u></a>
+    <input type="submit" value={% translate 'Подтвердить' context 'YES-like expression'%}></form>
+<a href={% url 'posts_full' %}><u>{% translate 'Отмена' context 'NO-like expression'%} </u></a>
 {% endblock content %}

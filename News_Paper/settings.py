@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+from News_Paper.logging_settings import log_set
+from django.urls import reverse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -161,120 +164,14 @@ CACHES = {
 }
 
 ABSOLUTE_URL_OVERRIDES = {
-    'news.post': lambda o: f'/news/{o.id}'
+    'news.post': lambda o: reverse('post_detail', args=o.id)
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'style': '{',
-            'format': '{asctime} {levelname} {message}',
-        },
-        'advanced': {
-            'style': '{',
-            'format': '{asctime} {levelname} {message} {pathname}'
-        },
-        'super_advanced': {
-            'style': '{',
-            'format': '{asctime} {levelname} {message} {pathname} {exc_info}'
-        },
-        'info_for_file': {
-            'style': '{',
-            'format': '{asctime} {levelname} {module} {message}'
-        },
-        'info_for_file_advanced': {
-            'style': '{',
-            'format': '{asctime} {levelname} {message} {pathname} {exc_info}'
-        },
-    },
-    'filters': {
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'console_advanced': {
-            'level': 'WARNING',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'advanced'
-        },
-        'console_super_advanced': {
-            'level': 'ERROR',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'super_advanced'
-        },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'formatter': 'info_for_file',
-            'filename': 'general.log',
-        },
-        'file_advanced': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'formatter': 'info_for_file_advanced',
-            'filename': 'errors.log',
-        },
-        'security_file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'formatter': 'info_for_file',
-            'filename': 'security.log',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler',
-            'formatter': 'advanced',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'console_advanced', 'console_super_advanced', 'file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['file_advanced', 'mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.server': {
-            'handlers': ['file_advanced', 'mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.template': {
-            'handlers': ['file_advanced'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.db_backends': {
-            'handlers': ['file_advanced'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['security_file'],
-            'propagate': False,
-        },
-        'news.templatetags.custom_filters_and_tags': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    }
-}
+# LOGGING = log_set
+LOCALE_PATHS = [BASE_DIR / 'locale']
+
+LANGUAGES = [
+    ('ru-RU', 'Русский'),
+    ('fr', 'Français'),
+    ('en', 'English')
+]
